@@ -1,4 +1,4 @@
-#Big Nerd Ranch Android Programming 3rd Ed -  Solutions to Exercises and Challenges in Java and Kotlin
+# Big Nerd Ranch Android Programming 3rd Ed -  Solutions to Exercises and Challenges in Java and Kotlin
 
 While learning Kotlin I wrote the solutions of the book exercises and challenges both in Java and Kotlin.
 
