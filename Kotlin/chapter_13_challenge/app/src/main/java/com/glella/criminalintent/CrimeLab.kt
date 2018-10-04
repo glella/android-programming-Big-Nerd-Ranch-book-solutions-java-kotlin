@@ -20,4 +20,15 @@ object CrimeLab {
         mCrimes.add(c)
     }
 
+    // Challenge
+    fun deleteCrime(id: UUID): Boolean {
+        for (crime in mCrimes) {
+            if (crime.mId.equals(id)) {
+                mCrimes.remove(crime)
+                return true
+            }
+        }
+        return false
+    }
+
 }

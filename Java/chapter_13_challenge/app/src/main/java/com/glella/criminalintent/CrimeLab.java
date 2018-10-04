@@ -38,4 +38,15 @@ public class CrimeLab {
         mCrimes.add(c);
     }
 
+    // Challenge
+    public Boolean deleteCrime(UUID id) {
+        for (Crime crime : mCrimes) {
+            if (crime.getId().equals(id)) {
+                mCrimes.remove(crime);
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

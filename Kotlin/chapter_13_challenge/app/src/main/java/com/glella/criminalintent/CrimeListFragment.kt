@@ -92,7 +92,9 @@ class CrimeListFragment : Fragment() {
 
     private fun updateSubtitle() {
         val crimeCount = CrimeLab.mCrimes.size
-        var subtitle: String? = getString(R.string.subtitle_format, crimeCount)
+        //var subtitle: String? = getString(R.string.subtitle_format, crimeCount)
+        // Challenge
+        var subtitle: String? = resources.getQuantityString(R.plurals.subtitle_plural, crimeCount, crimeCount)
 
         if (!mSubtitleVisible) {
             subtitle = null
