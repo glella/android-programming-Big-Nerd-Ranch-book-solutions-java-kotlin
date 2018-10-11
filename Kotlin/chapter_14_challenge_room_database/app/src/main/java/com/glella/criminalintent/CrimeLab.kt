@@ -1,9 +1,12 @@
 package com.glella.criminalintent
 
 
+import android.os.AsyncTask
 import com.glella.criminalintent.database.AppDatabase
 import com.glella.criminalintent.database.CrimesListDAO
 import java.util.*
+
+// Doing database operations in UI thread is BAD but doing it like this for simplicity in this test
 
 
 object CrimeLab {
@@ -16,21 +19,15 @@ object CrimeLab {
         appDB = ApplicationContextProvider.database!!
         crimesDAO = appDB.crimesListDAO()
 
+        // leaving just this one async as a test
+        AsyncTask.execute {
         mCrimes = getCrimes() as ArrayList<Crime>
+        }
     }
 
+
     fun getCrimes(): List<Crime> {
-
-       
-        //var crimes: ArrayList<Crime>
-
         var crimes = crimesDAO.getAllCrimes() as ArrayList<Crime>
-
-        //AsyncTask.execute({
-            //crimes = crimesDAO.getAllCrimes() as ArrayList<Crime>
-            //runOnUiThread { listCategoryAdapter.notifyDataSetChanged() }
-        //})
-
         return crimes
     }
 
@@ -54,7 +51,6 @@ object CrimeLab {
     // Challenge
     fun deleteCrime(crime: Crime): Boolean {
         crimesDAO.deleteCrime(crime)
-
         mCrimes.clear()
         mCrimes = getCrimes() as ArrayList<Crime>
 
