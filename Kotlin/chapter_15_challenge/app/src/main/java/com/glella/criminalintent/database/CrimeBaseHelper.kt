@@ -27,8 +27,9 @@ class CrimeBaseHelper (context: Context) : ManagedSQLiteOpenHelper(context, Crim
                 CrimeDbSchema.Crimetable.Cols.TITLE to TEXT,
                 CrimeDbSchema.Crimetable.Cols.DATE to INTEGER,
                 CrimeDbSchema.Crimetable.Cols.SOLVED to INTEGER,
-                CrimeDbSchema.Crimetable.Cols.SUSPECT to TEXT)
-
+                CrimeDbSchema.Crimetable.Cols.SUSPECT to TEXT,
+                CrimeDbSchema.Crimetable.Cols.SUSPECTID to TEXT,
+                CrimeDbSchema.Crimetable.Cols.SUSPECTPHONE to TEXT)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

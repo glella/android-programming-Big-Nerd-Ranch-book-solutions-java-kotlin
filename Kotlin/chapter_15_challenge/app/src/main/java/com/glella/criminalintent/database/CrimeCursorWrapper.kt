@@ -14,6 +14,8 @@ class CrimeCursorWrapper (cursor : Cursor): CursorWrapper(cursor) {
         val date = getLong(getColumnIndex(CrimeDbSchema.Crimetable.Cols.DATE))
         val isSolved = getInt(getColumnIndex(CrimeDbSchema.Crimetable.Cols.SOLVED))
         val suspect = getString(getColumnIndex(CrimeDbSchema.Crimetable.Cols.SUSPECT))
+        val suspectID = getString(getColumnIndex(CrimeDbSchema.Crimetable.Cols.SUSPECTID))
+        val suspectPhone = getString(getColumnIndex(CrimeDbSchema.Crimetable.Cols.SUSPECTPHONE))
 
         val crime = Crime()
         crime.mId = UUID.fromString(uuidString)
@@ -21,6 +23,8 @@ class CrimeCursorWrapper (cursor : Cursor): CursorWrapper(cursor) {
         crime.mDate = Date(date)
         crime.mSolved = (isSolved != 0)
         crime.mSuspect = suspect
+        crime.mSuspectID = suspectID
+        crime.mSuspectPhone = suspectPhone
 
         return crime
     }

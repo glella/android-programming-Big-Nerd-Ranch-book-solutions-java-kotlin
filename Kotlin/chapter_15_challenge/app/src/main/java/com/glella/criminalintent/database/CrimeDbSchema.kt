@@ -14,6 +14,9 @@ class CrimeDbSchema {
             val DATE = "date"
             val SOLVED = "solved"
             val SUSPECT = "suspect"
+            // Challenge
+            val SUSPECTID = "suspect_id"
+            val SUSPECTPHONE = "suspect_phone"
         }
 
 

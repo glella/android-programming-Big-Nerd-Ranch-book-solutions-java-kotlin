@@ -1,11 +1,15 @@
 package com.glella.criminalintent
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.support.v4.app.Fragment
+import android.support.v4.app.ShareCompat
+import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
@@ -25,12 +29,18 @@ class CrimeFragment: Fragment() {
     lateinit var mDateButton: Button
     lateinit var mReportButton: Button
     lateinit var mSuspectButton: Button
+    // Challenge
+    lateinit var mCallSuspectButton: Button
+
 
     companion object {
         private val ARG_CRIME_ID = "crime_id"
         private val DIALOG_DATE = "dialogDate"
         private val REQUEST_DATE = 0
         private val REQUEST_CONTACT = 1
+        // Challenge
+        private val CONTACTS_PERMISSIONS = arrayOf(Manifest.permission.READ_CONTACTS)
+        private val REQUEST_CONTACTS_PERMISSIONS = 3
 
         fun newInstance(crimeID: UUID): CrimeFragment {
             val args = Bundle()
@@ -88,25 +98,55 @@ class CrimeFragment: Fragment() {
         mSolvedCheckBox.isChecked = mCrime.mSolved
         mSolvedCheckBox.setOnCheckedChangeListener { _, b -> mCrime.mSolved = b }
 
+        val packageManager = activity!!.packageManager
         mReportButton = v.findViewById<View>(R.id.crime_report) as Button
         mReportButton.setOnClickListener {
+            // Challenge
+            /*
             var i = Intent(Intent.ACTION_SEND)
             i.type = "text/plain"
             i.putExtra(Intent.EXTRA_TEXT, getCrimeReport())
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
             i = Intent.createChooser(i, getString(R.string.send_report))
             startActivity(i)
+            */
+            val mimeType = "text/plain"
+            val title = getString(R.string.send_report)
+            val i = ShareCompat.IntentBuilder.from(activity!!)
+                    .setChooserTitle(title)
+                    .setType(mimeType)
+                    .setText(getCrimeReport())
+                    .createChooserIntent()
+
+            if (i.resolveActivity(packageManager) != null) {
+                startActivity(i)
+            }
+        }
+
+        // Challenge
+        val callContact = Intent(Intent.ACTION_DIAL)
+        mCallSuspectButton = v.findViewById<View>(R.id.call_suspect) as Button
+        mCallSuspectButton.setOnClickListener {
+            val numberString = "tel:" + mCrime.mSuspectPhone
+            val number = Uri.parse(numberString)
+            callContact.data = number
+            startActivity(callContact)
         }
 
         val pickContact = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
         mSuspectButton = v.findViewById<View>(R.id.crime_suspect) as Button
-        mSuspectButton.setOnClickListener { startActivityForResult(pickContact, REQUEST_CONTACT) }
+        mSuspectButton.setOnClickListener {
+            mCallSuspectButton.isEnabled = true
+            startActivityForResult(pickContact, REQUEST_CONTACT)
+        }
 
         if (mCrime.mSuspect != null) {
             mSuspectButton.setText(mCrime.mSuspect)
+            mCallSuspectButton.isEnabled = true
+        } else {
+            mCallSuspectButton.isEnabled = false
         }
 
-        val packageManager = activity!!.packageManager
         if (packageManager.resolveActivity(pickContact,
                         PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.isEnabled = false
@@ -152,6 +192,86 @@ class CrimeFragment: Fragment() {
                 c!!.close()
             }
         }
+    }
+
+    // Challenge
+    private fun getSuspectName(data: Intent): String? {
+        val contactUri = data.data
+        // Specify which fields you want your query to return values for
+        val queryFields = arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME)
+        // Perform your query - the contactUri is like a "where" clause here.
+        val c = activity!!.contentResolver
+                .query(contactUri!!, queryFields, null, null, null)
+        try {
+            // Double-check that you actually got results.
+            if (c!!.count == 0) {
+                return null
+            }
+            // Pull out the first column of the first row of data - that is your suspect's name.
+            c.moveToFirst()
+
+            mCrime.mSuspectID = c.getString(0)
+            return c.getString(1)
+
+        } finally {
+            c!!.close()
+        }
+    }
+
+    // Challenge
+    private fun getSuspectPhoneNumber(contactId: String): String? {
+        var suspectPhoneNumber: String? = null
+        // The content URI of the CommonDataKinds.Phone
+        val phoneContactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+        // The columns to return for each row
+        val queryFields = arrayOf(ContactsContract.Data.CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.NUMBER, // which is the default phone number.
+                ContactsContract.CommonDataKinds.Phone.TYPE)
+        // Selection criteria
+        val mSelectionClause = ContactsContract.Data.CONTACT_ID + " = ?"
+        val mSelectionArgs = arrayOf("")
+        mSelectionArgs[0] = contactId
+        // Do a query against the table and return a Cursor object
+        val c = activity!!.contentResolver
+                .query(phoneContactUri, queryFields, mSelectionClause, mSelectionArgs, null)
+        try {
+            // Double-check that you actually got results.
+            if (c!!.count == 0) {
+                return null
+            }
+            while (c.moveToNext()) {
+                val phoneType = c.getInt(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))
+                if (phoneType == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE) {
+                    suspectPhoneNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DATA))
+                    break
+                }
+            }
+        } finally {
+            c!!.close()
+        }
+        return suspectPhoneNumber
+    }
+
+    // Challenge
+    private fun hasContactPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(activity!!, CONTACTS_PERMISSIONS[0])
+        return result == PackageManager.PERMISSION_GRANTED
+    }
+
+    // Challenge
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_CONTACTS_PERMISSIONS -> if (hasContactPermission()) {
+                updateSuspectPhone()
+            }
+        }
+    }
+
+    // Challenge
+    private fun updateSuspectPhone() {
+        val suspectPhoneNumber = getSuspectPhoneNumber(mCrime.mSuspectID!!)
+        mCrime.mSuspectPhone = suspectPhoneNumber
     }
 
     private fun updateDate() {

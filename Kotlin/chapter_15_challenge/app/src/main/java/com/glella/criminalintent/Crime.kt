@@ -9,6 +9,9 @@ class Crime () {
     var mDate: Date? = null
     var mSolved: Boolean = false
     var mSuspect: String? = null
+    // Challenge
+    var mSuspectID: String? = null
+    var mSuspectPhone: String? = null
 
     init {
         mId = UUID.randomUUID()

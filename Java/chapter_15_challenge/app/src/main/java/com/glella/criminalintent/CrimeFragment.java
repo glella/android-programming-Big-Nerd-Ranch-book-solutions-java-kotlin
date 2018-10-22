@@ -253,10 +253,9 @@ public class CrimeFragment extends Fragment {
         };
         // Selection criteria
         String mSelectionClause = ContactsContract.Data.CONTACT_ID + " = ?";
-        // Selection criteria
         String[] mSelectionArgs = {""};
         mSelectionArgs[0] = contactId;
-        // Does a query against the table and returns a Cursor object
+        // Do a query against the table and return a Cursor object
         Cursor c = getActivity().getContentResolver()
                 .query(phoneContactUri,queryFields, mSelectionClause, mSelectionArgs, null );
         try {
@@ -277,11 +276,13 @@ public class CrimeFragment extends Fragment {
         return suspectPhoneNumber;
     }
 
+    // Challenge
     private boolean hasContactPermission() {
         int result = ContextCompat.checkSelfPermission(getActivity(), CONTACTS_PERMISSIONS[0]);
         return result == PackageManager.PERMISSION_GRANTED;
     }
 
+    // Challenge
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         switch (requestCode) {
@@ -292,6 +293,7 @@ public class CrimeFragment extends Fragment {
         }
     }
 
+    // Challenge
     private void updateSuspectPhone () {
         String suspectPhoneNumber = getSuspectPhoneNumber(mCrime.getSuspectID());
         mCrime.setSuspectPhone(suspectPhoneNumber);

@@ -19,6 +19,8 @@ object CrimeLab {
     val dateColumn = CrimeDbSchema.Crimetable.Cols.DATE
     val solvedColumn = CrimeDbSchema.Crimetable.Cols.SOLVED
     val suspectColumn = CrimeDbSchema.Crimetable.Cols.SUSPECT
+    val suspectIDColumn = CrimeDbSchema.Crimetable.Cols.SUSPECTID
+    val suspectPhoneColumn = CrimeDbSchema.Crimetable.Cols.SUSPECTPHONE
 
     init {
         val context: Context = ApplicationContextProvider.applicationContext()
@@ -81,6 +83,8 @@ object CrimeLab {
         values.put(dateColumn, crime.mDate!!.getTime())
         values.put(solvedColumn, if (crime.mSolved) 1 else 0)
         values.put(suspectColumn, crime.mSuspect)
+        values.put(suspectIDColumn, crime.mSuspectID)
+        values.put(suspectPhoneColumn, crime.mSuspectPhone)
 
         return values
     }
