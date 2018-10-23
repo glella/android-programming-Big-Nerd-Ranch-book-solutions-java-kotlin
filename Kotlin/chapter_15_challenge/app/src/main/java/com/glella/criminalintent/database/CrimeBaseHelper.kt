@@ -2,8 +2,7 @@ package com.glella.criminalintent.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import com.glella.criminalintent.database.CrimeDbSchema.Crimetable.DATABASE_NAME
-import org.jetbrains.anko.db.*
+import org.jetbrains.anko.db.ManagedSQLiteOpenHelper
 
 class CrimeBaseHelper (context: Context) : ManagedSQLiteOpenHelper(context, CrimeDbSchema.Crimetable.DATABASE_NAME,null, CrimeDbSchema.Crimetable.VERSION ) {
 
@@ -21,21 +20,23 @@ class CrimeBaseHelper (context: Context) : ManagedSQLiteOpenHelper(context, Crim
 
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.createTable(DATABASE_NAME, true,
-                "_id" to INTEGER + PRIMARY_KEY + UNIQUE + AUTOINCREMENT,
-                CrimeDbSchema.Crimetable.Cols.UUID to TEXT,
-                CrimeDbSchema.Crimetable.Cols.TITLE to TEXT,
-                CrimeDbSchema.Crimetable.Cols.DATE to INTEGER,
-                CrimeDbSchema.Crimetable.Cols.SOLVED to INTEGER,
-                CrimeDbSchema.Crimetable.Cols.SUSPECT to TEXT,
-                CrimeDbSchema.Crimetable.Cols.SUSPECTID to TEXT,
-                CrimeDbSchema.Crimetable.Cols.SUSPECTPHONE to TEXT)
+        db.execSQL("create table " + CrimeDbSchema.Crimetable.NAME + "(" +
+                " _id integer primary key autoincrement, " +
+                CrimeDbSchema.Crimetable.Cols.UUID + ", " +
+                CrimeDbSchema.Crimetable.Cols.TITLE + ", " +
+                CrimeDbSchema.Crimetable.Cols.DATE + ", " +
+                CrimeDbSchema.Crimetable.Cols.SOLVED + ", " +
+                CrimeDbSchema.Crimetable.Cols.SUSPECT + ", " +
+                CrimeDbSchema.Crimetable.Cols.SUSPECTID + ", " +
+                CrimeDbSchema.Crimetable.Cols.SUSPECTPHONE +
+                ")"
+        )
+
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // Here you can upgrade tables, as usual
-        db.dropTable(DATABASE_NAME, true)
-        onCreate(db)
+
     }
 
 }
